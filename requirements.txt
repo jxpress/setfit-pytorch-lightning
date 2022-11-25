@@ -1,7 +1,7 @@
 # --------- pytorch --------- #
 torch>=1.10.0
 torchvision>=0.11.0
-pytorch-lightning==1.8.1
+pytorch-lightning==1.7.1
 torchmetrics==0.10.0
 
 # --------- hydra --------- #
@@ -15,6 +15,8 @@ hydra-optuna-sweeper==1.2.0
 # mlflow
 # comet-ml
 
+# --------- pipsetfit --------- #
+setfit==0.4.1
 # --------- others --------- #
 pyrootutils     # standardizing the project root setup
 pre-commit      # hooks for applying linters on commit
