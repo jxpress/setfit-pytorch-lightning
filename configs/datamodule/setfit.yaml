@@ -1,0 +1,10 @@
+_target_: src.datamodules.setfit_datamodule.DataModule
+
+dataset_id: sst2
+num_samples: 16
+max_input_length: 128
+batch_size: ${batch_size}
+column_mapping: {
+        "sentence": "text",
+        "label": "label",
+    }
