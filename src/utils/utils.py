@@ -1,5 +1,6 @@
 import time
 import warnings
+import os
 from importlib.util import find_spec
 from pathlib import Path
 from typing import Any, Callable, Dict, List
@@ -11,6 +12,9 @@ from pytorch_lightning.loggers import LightningLoggerBase
 from pytorch_lightning.utilities import rank_zero_only
 
 from src.utils import pylogger, rich_utils
+import pytorch_lightning as pl
+import pickle
+from src.models.setfit_module import SetfitPLModule
 
 log = pylogger.get_pylogger(__name__)
 
@@ -203,3 +207,13 @@ def close_loggers() -> None:
         if wandb.run:
             log.info("Closing wandb!")
             wandb.finish()
+
+def load_from_checkpoint(
+    model_path: str,
+    model_class: "pl.LightningModule" = SetfitPLModule,
+) -> "pl.LightningModule":
+    pl_engine = model_class.load_from_checkpoint(model_path)
+    if not pl_engine.is_torch_model_head:
+        with open(os.path.splitext(model_path)[0] + "_head.pickle", "rb") as f:
+            pl_engine.model.model_head = pickle.load(f)
+    return pl_engine
