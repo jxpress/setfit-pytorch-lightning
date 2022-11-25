@@ -1,0 +1,3 @@
+_target_: src.models.setfit_module.SetfitPLModule
+model_id: sentence-transformers/paraphrase-mpnet-base-v2
+batch_size: ${batch_size}

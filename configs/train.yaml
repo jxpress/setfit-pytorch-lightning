@@ -4,8 +4,8 @@
 # order of defaults determines the order in which configs override each other
 defaults:
   - _self_
-  - datamodule: mnist.yaml
-  - model: mnist.yaml
+  - datamodule: setfit.yaml
+  - model: setfit_nn.yaml
   - callbacks: default.yaml
   - logger: null # set logger here or use command line (e.g. `python train.py logger=tensorboard`)
   - trainer: default.yaml
@@ -29,6 +29,8 @@ defaults:
 
 # task name, determines output directory path
 task_name: "train"
+
+batch_size: 8
 
 # tags to help you identify your experiments
 # you can overwrite this in experiment configs
