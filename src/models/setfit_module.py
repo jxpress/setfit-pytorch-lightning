@@ -141,6 +141,10 @@ class SetfitPLModule(LightningModule, SetFitTrainer):
         x_test: Union[List[str], torch.Tensor],
     ):
         return self.model.predict_proba(x_test)
+    
+    def on_fit_start(self)-> None:
+        # set device of the model body for training of sentence transformers
+        self.model_body._target_device = self.device
 
     def on_train_start(self):
         self.val_acc_best.reset()
@@ -409,15 +413,16 @@ class SetfitPLModule(LightningModule, SetFitTrainer):
         texts = self.trainer.test_dataloaders[0].dataset.x
         target = self.trainer.test_dataloaders[0].dataset.y
 
-        res_df = pd.DataFrame(
-            {
-                "texts": texts,
-                "target": target,
-                "prediction": prediction,
-            }
-        )
 
         if hasattr(self.logger, "_save_dir"):
+            res_df = pd.DataFrame(
+                {
+                    "texts": texts,
+                    "target": target,
+                    "prediction": prediction,
+                }
+            )
+
             res_df.to_csv(
                 os.path.join(self.logger._save_dir, "result.csv"), index=False
             )
