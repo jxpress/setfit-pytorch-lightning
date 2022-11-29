@@ -14,10 +14,10 @@ def cfg_train_global() -> DictConfig:
         with open_dict(cfg):
             cfg.paths.root_dir = str(pyrootutils.find_root())
             cfg.trainer.max_epochs = 1
-            cfg.trainer.limit_train_batches = 0.01
+            cfg.trainer.limit_train_batches = 1
             cfg.trainer.limit_val_batches = 0.1
             cfg.trainer.limit_test_batches = 0.1
-            cfg.trainer.accelerator = "cpu"
+            cfg.trainer.accelerator = "auto"
             cfg.trainer.devices = 1
             cfg.datamodule.num_workers = 0
             cfg.datamodule.pin_memory = False
