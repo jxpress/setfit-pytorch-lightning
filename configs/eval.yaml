@@ -2,8 +2,8 @@
 
 defaults:
   - _self_
-  - datamodule: mnist.yaml # choose datamodule with `test_dataloader()` for evaluation
-  - model: mnist.yaml
+  - datamodule: setfit.yaml
+  - model: setfit_nn.yaml
   - logger: null
   - trainer: default.yaml
   - paths: default.yaml
@@ -11,6 +11,7 @@ defaults:
   - hydra: default.yaml
 
 task_name: "eval"
+batch_size: 8
 
 tags: ["dev"]
 
