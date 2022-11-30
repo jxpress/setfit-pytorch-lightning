@@ -45,5 +45,5 @@ hydra:
 
     # define hyperparameter search space
     params:
-      batch_size: choice(4,8,16,32)
+      batch_size: choice(1,2,4,8)
       model.model_id: choice(sentence-transformers/paraphrase-mpnet-base-v2, paraphrase-multilingual-MiniLM-L12-v2)
