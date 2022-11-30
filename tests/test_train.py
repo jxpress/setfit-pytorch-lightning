@@ -39,8 +39,6 @@ def test_train_epoch_gpu_amp(cfg_train):
     train(cfg_train)
 
 
-
-
 @pytest.mark.slow
 def test_train_resume(tmp_path, cfg_train):
     """Run 1 epoch, finish, and resume for another epoch."""

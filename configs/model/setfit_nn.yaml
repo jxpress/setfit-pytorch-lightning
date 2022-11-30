@@ -3,4 +3,4 @@ model_id: sentence-transformers/paraphrase-mpnet-base-v2
 batch_size: ${batch_size}
 
 use_differentiable_head: True
-head_params: {"out_features": 2}
+head_params: { "out_features": 2 }

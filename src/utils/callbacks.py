@@ -13,7 +13,7 @@ warning_cache = WarningCache()
 
 
 class SetFitModelCheckpoint(ModelCheckpoint):
-    """This class is created to save the model head, if model_head is sklearn class"""
+    """This class is created to save the model head, if model_head is sklearn class."""
 
     def _save_checkpoint(self, trainer: "pl.Trainer", filepath: str) -> None:
         trainer.save_checkpoint(filepath, self.save_weights_only)
@@ -36,8 +36,5 @@ class SetFitModelCheckpoint(ModelCheckpoint):
             ]
             model_head_paths = glob(os.path.join(self.dirpath, "*.pickle"))
             for model_head_path in model_head_paths:
-                if (
-                    not model_head_path.replace("_head.pickle", "")
-                    in checkpoint_file_names
-                ):
+                if not model_head_path.replace("_head.pickle", "") in checkpoint_file_names:
                     os.remove(model_head_path)

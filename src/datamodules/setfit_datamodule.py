@@ -5,10 +5,9 @@ import pandas as pd
 import pyarrow as pa
 from datasets import Dataset, load_dataset
 from pytorch_lightning import LightningDataModule
-from torch.utils.data import DataLoader
-
 from setfit import sample_dataset
 from setfit.data import SetFitDataset
+from torch.utils.data import DataLoader
 
 
 class DataModule(LightningDataModule):
@@ -26,18 +25,18 @@ class DataModule(LightningDataModule):
 
         # this line allows to access init params with 'self.hparams' attribute
         self.save_hyperparameters(logger=False, ignore="local_data_path")
-        
+
         dataset = load_dataset(self.hparams.dataset_id)
         if self.hparams.column_mapping:
             for key in dataset:
-                dataset[key] = self._apply_column_mapping(dataset[key], self.hparams.column_mapping)
+                dataset[key] = self._apply_column_mapping(
+                    dataset[key], self.hparams.column_mapping
+                )
         self.train_dataset = sample_dataset(
             dataset["train"], label_column="label", num_samples=self.hparams.num_samples
         )
         # valid and test data is sepalated from original validation data
-        self.valid_dataset, self.test_dataset = self._separate_dataset(
-            dataset["validation"]
-        )
+        self.valid_dataset, self.test_dataset = self._separate_dataset(dataset["validation"])
 
         # for error of tokenizer (https://stackoverflow.com/questions/62691279/how-to-disable-tokenizers-parallelism-true-false-warning)
         os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -45,17 +44,15 @@ class DataModule(LightningDataModule):
     def _apply_column_mapping(
         self, dataset: "Dataset", column_mapping: Dict[str, str]
     ) -> "Dataset":
-        """
-        Applies the provided column mapping to the dataset, renaming columns accordingly.
+        """Applies the provided column mapping to the dataset, renaming columns accordingly.
+
         Extra features not in the column mapping are prefixed with `"feat_"`.
         """
         dataset = dataset.rename_columns(
             {
                 **column_mapping,
                 **{
-                    col: f"feat_{col}"
-                    for col in dataset.column_names
-                    if col not in column_mapping
+                    col: f"feat_{col}" for col in dataset.column_names if col not in column_mapping
                 },
             }
         )
@@ -68,8 +65,8 @@ class DataModule(LightningDataModule):
         )
         return dataset
 
-    def _separate_dataset(self, datset: "Dataset") -> Tuple["Dataset", "Dataset"]:
-        df = pd.DataFrame(datset)
+    def _separate_dataset(self, dataset: "Dataset") -> Tuple["Dataset", "Dataset"]:
+        df = pd.DataFrame(dataset)
         val_df = df.iloc[: len(df) // 2].reset_index(drop=True)
         test_df = df.iloc[len(df) // 2 :].reset_index(drop=True)
 

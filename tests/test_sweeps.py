@@ -50,5 +50,3 @@ def test_optuna_sweep(tmp_path):
         "++trainer.fast_dev_run=true",
     ] + overrides
     run_sh_command(command)
-
-
