@@ -1,6 +1,7 @@
 import copy
 import math
 import os
+from logging import getLogger
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Union
 
 import numpy as np
@@ -13,25 +14,21 @@ from sentence_transformers.datasets import SentenceLabelDataset
 from sentence_transformers.losses.BatchHardTripletLoss import (
     BatchHardTripletLossDistanceFunction,
 )
-from torch.utils.data import DataLoader
-from torchmetrics import Accuracy, MaxMetric
-
-from logging import getLogger
 from setfit import SetFitModel, SetFitTrainer
 from setfit.modeling import (
     SupConLoss,
     sentence_pairs_generation,
     sentence_pairs_generation_multilabel,
 )
+from torch.utils.data import DataLoader
+from torchmetrics import Accuracy, MaxMetric
 
 if TYPE_CHECKING:
     from datasets import Dataset
 
-    from setfit import SetFitModel
-
 
 logger = getLogger(__name__)
-logger.info('message')
+logger.info("message")
 
 
 class SetfitPLModule(LightningModule, SetFitTrainer):
@@ -52,9 +49,7 @@ class SetfitPLModule(LightningModule, SetFitTrainer):
         self,
         model_id: str,
         model_init: Callable[[], "SetFitModel"] = None,
-        metric: Union[
-            str, Callable[["Dataset", "Dataset"], Dict[str, float]]
-        ] = "accuracy",
+        metric: Union[str, Callable[["Dataset", "Dataset"], Dict[str, float]]] = "accuracy",
         loss_class=losses.CosineSimilarityLoss,
         num_iterations: int = 20,
         learning_rate: float = 2e-5,
@@ -142,13 +137,15 @@ class SetfitPLModule(LightningModule, SetFitTrainer):
     ):
         return self.model.predict_proba(x_test)
 
+    def on_fit_start(self) -> None:
+        # set device of the model body for training of sentence transformers
+        self.model_body._target_device = self.device
+
     def on_train_start(self):
         self.val_acc_best.reset()
 
     def on_train_epoch_start(self):
-        """
-        train only sentence_transformers
-        """
+        """train only sentence_transformers."""
         if self.is_torch_model_head:
             self.model.unfreeze()
 
@@ -253,12 +250,12 @@ class SetfitPLModule(LightningModule, SetFitTrainer):
         self.model_body_prev_state = copy.deepcopy(self.model_body.state_dict())
 
     def shered_step(self, batch: Any, is_training=False):
-        """
-        Common code for training step, validation_step, and test_step
+        """Common code for training step, validation_step, and test_step.
 
-        If model_head is torch module, backward
-        if model_head is sklearn module, only input data for model_head is stored in self.embeddings and self.targets
-        Model_head is trained by using thses data in on_validation_start, since on_validation_start function is executed just after last training epoch
+        If model_head is torch module, backward if model_head is sklearn module, only input data
+        for model_head is stored in self.embeddings and self.targets Model_head is trained by using
+        these data in on_validation_start, since on_validation_start function is executed just
+        after last training epoch
         """
         if self.is_torch_model_head:
             features, labels = batch
@@ -318,9 +315,7 @@ class SetfitPLModule(LightningModule, SetFitTrainer):
         res = self.shered_step(batch, is_training=True)
         if self.is_torch_model_head:
             acc = self.train_acc(res["preds"], res["targets"])
-            self.log(
-                "train/loss", res["loss"], on_step=False, on_epoch=True, prog_bar=True
-            )
+            self.log("train/loss", res["loss"], on_step=False, on_epoch=True, prog_bar=True)
             self.log("train/acc", acc, on_step=False, on_epoch=True, prog_bar=True)
         return {
             "embeddings": res["embeddings"],
@@ -328,8 +323,8 @@ class SetfitPLModule(LightningModule, SetFitTrainer):
         }
 
     def on_validation_start(self):
-        """
-        train the model_head if model_head is sklearn module.
+        """train the model_head if model_head is sklearn module.
+
         this function is called just after last training step
         https://pytorch-lightning.readthedocs.io/en/stable/common/lightning_module.html#hooks
         """
@@ -342,14 +337,10 @@ class SetfitPLModule(LightningModule, SetFitTrainer):
         res = self.shered_step(batch)
         if self.is_torch_model_head:
             acc = self.val_acc(res["preds"], res["targets"])
-            self.log(
-                "val/loss", res["loss"], on_step=False, on_epoch=True, prog_bar=True
-            )
+            self.log("val/loss", res["loss"], on_step=False, on_epoch=True, prog_bar=True)
             self.log("val/acc", acc, on_step=False, on_epoch=True, prog_bar=True)
         else:
-            acc = self.val_acc(
-                torch.tensor(res["preds"]), res["targets"].detach().cpu()
-            )
+            acc = self.val_acc(torch.tensor(res["preds"]), res["targets"].detach().cpu())
             loss = self.criterion(
                 torch.tensor(res["scores"]),
                 res["targets"].detach().cpu().to(torch.long),
@@ -380,16 +371,12 @@ class SetfitPLModule(LightningModule, SetFitTrainer):
         res = self.shered_step(batch)
         if self.is_torch_model_head:
             acc = self.test_acc(res["preds"], res["targets"])
-            self.log(
-                "test/loss", res["loss"], on_step=False, on_epoch=True, prog_bar=True
-            )
+            self.log("test/loss", res["loss"], on_step=False, on_epoch=True, prog_bar=True)
             self.log("test/acc", acc, on_step=False, on_epoch=True, prog_bar=True)
             targets = res["targets"].detach().cpu()
             preds = res["preds"].detach().cpu()
         else:
-            acc = self.test_acc(
-                torch.tensor(res["preds"]), res["targets"].detach().cpu()
-            )
+            acc = self.test_acc(torch.tensor(res["preds"]), res["targets"].detach().cpu())
             loss = self.criterion(
                 torch.tensor(res["scores"]),
                 res["targets"].detach().cpu().to(torch.long),
@@ -409,18 +396,16 @@ class SetfitPLModule(LightningModule, SetFitTrainer):
         texts = self.trainer.test_dataloaders[0].dataset.x
         target = self.trainer.test_dataloaders[0].dataset.y
 
-        res_df = pd.DataFrame(
-            {
-                "texts": texts,
-                "target": target,
-                "prediction": prediction,
-            }
-        )
-
         if hasattr(self.logger, "_save_dir"):
-            res_df.to_csv(
-                os.path.join(self.logger._save_dir, "result.csv"), index=False
+            res_df = pd.DataFrame(
+                {
+                    "texts": texts,
+                    "target": target,
+                    "prediction": prediction,
+                }
             )
+
+            res_df.to_csv(os.path.join(self.logger._save_dir, "result.csv"), index=False)
 
     def predict_step(self, batch: Any, batch_idx: int):
         pass

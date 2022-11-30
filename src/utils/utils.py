@@ -1,20 +1,20 @@
+import os
+import pickle
 import time
 import warnings
-import os
 from importlib.util import find_spec
 from pathlib import Path
 from typing import Any, Callable, Dict, List
 
 import hydra
+import pytorch_lightning as pl
 from omegaconf import DictConfig
 from pytorch_lightning import Callback
 from pytorch_lightning.loggers import LightningLoggerBase
 from pytorch_lightning.utilities import rank_zero_only
 
-from src.utils import pylogger, rich_utils
-import pytorch_lightning as pl
-import pickle
 from src.models.setfit_module import SetfitPLModule
+from src.utils import pylogger, rich_utils
 
 log = pylogger.get_pylogger(__name__)
 
@@ -207,6 +207,7 @@ def close_loggers() -> None:
         if wandb.run:
             log.info("Closing wandb!")
             wandb.finish()
+
 
 def load_from_checkpoint(
     model_path: str,

@@ -23,3 +23,19 @@ exclude_lines = [
     "raise NotImplementedError()",
     "if __name__ == .__main__.:",
 ]
+
+[tool.poetry]
+name = "setfit-github"
+version = "0.1.0"
+description = ""
+authors = ["Yongtae <y.hwang@jxpress.net>"]
+readme = "README.md"
+packages = [{include = "setfit_github"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
