@@ -37,30 +37,3 @@ def test_train_epoch_gpu_amp(cfg_train):
         cfg_train.trainer.accelerator = "gpu"
         cfg_train.trainer.precision = 16
     train(cfg_train)
-
-
-@pytest.mark.slow
-def test_train_resume(tmp_path, cfg_train):
-    """Run 1 epoch, finish, and resume for another epoch."""
-    with open_dict(cfg_train):
-        cfg_train.trainer.max_epochs = 1
-
-    HydraConfig().set_config(cfg_train)
-    metric_dict_1, _ = train(cfg_train)
-
-    files = os.listdir(tmp_path / "checkpoints")
-    assert "last.ckpt" in files
-    assert "epoch_000.ckpt" in files
-
-    with open_dict(cfg_train):
-        cfg_train.ckpt_path = str(tmp_path / "checkpoints" / "last.ckpt")
-        cfg_train.trainer.max_epochs = 2
-
-    metric_dict_2, _ = train(cfg_train)
-
-    files = os.listdir(tmp_path / "checkpoints")
-    assert "epoch_001.ckpt" in files
-    assert "epoch_002.ckpt" not in files
-
-    assert metric_dict_1["train/acc"] < metric_dict_2["train/acc"]
-    assert metric_dict_1["val/acc"] < metric_dict_2["val/acc"]

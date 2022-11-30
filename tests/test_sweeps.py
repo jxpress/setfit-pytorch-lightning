@@ -29,7 +29,7 @@ def test_hydra_sweep(tmp_path):
         startfile,
         "-m",
         "hydra.sweep.dir=" + str(tmp_path),
-        "model.optimizer.lr=0.005,0.01",
+        "batch_size=4,8",
         "++trainer.fast_dev_run=true",
     ] + overrides
 
@@ -43,9 +43,9 @@ def test_optuna_sweep(tmp_path):
     command = [
         startfile,
         "-m",
-        "hparams_search=mnist_optuna",
+        "hparams_search=setfit_optuna",
         "hydra.sweep.dir=" + str(tmp_path),
-        "hydra.sweeper.n_trials=10",
+        "hydra.sweeper.n_trials=5",
         "hydra.sweeper.sampler.n_startup_trials=5",
         "++trainer.fast_dev_run=true",
     ] + overrides
