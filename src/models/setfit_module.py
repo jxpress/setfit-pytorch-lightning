@@ -394,10 +394,10 @@ class SetfitPLModule(LightningModule, SetFitTrainer):
             prediction = torch.cat([output["preds"] for output in outputs]).numpy()
         else:
             prediction = np.concatenate([output["preds"] for output in outputs])
-        texts = self.trainer.test_dataloaders[0].dataset.x
-        target = self.trainer.test_dataloaders[0].dataset.y
+        texts = self.trainer.test_dataloaders[0].dataset.x[: len(prediction)]
+        target = self.trainer.test_dataloaders[0].dataset.y[: len(prediction)]
 
-        if hasattr(self.logger, "_save_dir"):
+        if hasattr(self.logger, "_save_dir") and not self.trainer.fast_dev_run:
             res_df = pd.DataFrame(
                 {
                     "texts": texts,
@@ -406,7 +406,7 @@ class SetfitPLModule(LightningModule, SetFitTrainer):
                 }
             )
 
-            res_df.to_csv(os.path.join(self.logger._save_dir, "result.csv"), index=False)
+            res_df.to_csv(os.path.join(str(self.logger._save_dir), "result.csv"), index=False)
 
     def predict_step(self, batch: Any, batch_idx: int):
         pass
