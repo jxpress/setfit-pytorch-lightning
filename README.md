@@ -6,11 +6,11 @@
 
 # 🤗 About SetFit
 
-The [SetFit](https://github.com/huggingface/setfit) provides the strong method of a few shot learning for text classification.
+The [SetFit](https://github.com/huggingface/setfit) provides a strong method of few-shot learning for text classification.
 With SetFit, you can create an AI with an accuracy comparable to GPT3 with as little as a few dozen data points.
-You can see official [paper](https://arxiv.org/abs/2209.11055), [blog](https://huggingface.co/blog/setfit), and [code](https://github.com/huggingface/setfit) of SetFit.
+You can see the official [paper](https://arxiv.org/abs/2209.11055), [blog](https://huggingface.co/blog/setfit), and [code](https://github.com/huggingface/setfit) of SetFit.
 
-If you want to experience SetFit, you can access [here](https://github.com/huggingface/setfit/tree/main/notebooks) and find same example notebooks to run SetFit.
+If you want to run SetFit instantaneously, you can access [here](https://github.com/huggingface/setfit/tree/main/notebooks) and find some example notebooks to run SetFit.
 
 This repository provides code that allows [SetFit](https://github.com/huggingface/setfit) to run in [PyTorch Lightning](https://github.com/PyTorchLightning/pytorch-lightning) to facilitate parameter, experiment management and so on.
 
@@ -51,10 +51,11 @@ python src/train.py ++trainer.fast_dev_run=true
 ## step 1. Custom LightningDataModule.
 
 Data is managed in LightningDataModule.
-In the [the sample code](src/datamodules/setfit_datamodule.py), training data is obtained from the sst2 dataset.
+In [the sample code](src/datamodules/setfit_datamodule.py), training data is obtained from the sst2 dataset.
 
-If you are not familiar with PyTorch Lightning, I recommend you to change only self.train_dataset, self.valid_dataset and self.test_dataset in `__init__`.
-Parameter of Datamodule is managed in [config file](configs/datamodule/setfit.yaml).
+If you are not familiar with PyTorch Lightning, I recommend you to change only self.train_dataset, self.valid_dataset and self.test_dataset in [`__init__` of DataModule](src/datamodules/setfit_datamodule.py).
+
+Parameters of Datamodule are managed in [config file](configs/datamodule/setfit.yaml).
 
 Or if you want to custom more, [README of lightning-hydra-template](https://github.com/ashleve/lightning-hydra-template) would offer useful information.
 
@@ -68,12 +69,12 @@ If you want to customize more, see [here](documents/Implemented_strategy.md) to 
 
 <br>
 
-## step 3. Custom other option such as callback or logger.
+## step 3. Custom other options such as callback or logger.
 
 PyTorch Lightning offers useful [callbacks](https://pytorch-lightning.readthedocs.io/en/stable/extensions/callbacks.html) and [logger](https://pytorch-lightning.readthedocs.io/en/stable/extensions/logging.html) to save a model or metrics and so on.
 You can manage what and how callback or logger will be called in [config files](configs).
 
-**⚠Note : if you want to use callbacks of ModelCheckpoint, use [SetFitModelCheckpoint](src/utils/callbacks.py) to save model if model head is consist of sklearn, like sample code**
+**⚠Note : if you want to use callbacks of ModelCheckpoint, use [SetFitModelCheckpoint](src/utils/callbacks.py) to save the model if the model head is consist of sklearn, like sample code**
 
 ## step 4. Execute the train
 
@@ -91,13 +92,13 @@ python src/train.py trainer.max_epochs=1
 
 ## step 5. Load the trained model
 
-Since SetFIt model may be configured with sklearn, so please load the model as in [this notebook](notebooks/model_load.ipynb).
+Since SetFit model may be configured with sklearn, so please load the model as in [this notebook](notebooks/model_load.ipynb).
 
 # 🐾 others
 
 ## Experiment management
 
-For managing your experimentm you can add experimental confition to config file [like this](configs/experiment/example.yaml) and run like below
+For managing your experimentm you can add experimental confition to config file [like this](configs/experiment/example.yaml) and run it like below
 
 ```bash
 python src/train.py experiment=example
@@ -121,10 +122,12 @@ For more information, [this](https://github.com/ashleve/lightning-hydra-template
 ## 😍 Welcome contributions
 
 if you find some error or feel something, feel free to tell me by PR or Issues!!
-Opinions of any content are welcome!
+Opinions on any content are welcome!
 
 ## 📝 Appendix
 
-JX PRESS Corporation has created and use the training template code in order to enhance team development capability and development speed.
+This Implementation is based on our experience in adapting SetFit to the JX Press training template code.
+
+JX PRESS Corporation has created and used the training template code in order to enhance team development capability and development speed.
 
 For more information on JX's training template code, see [How we at JX PRESS Corporation devise for team development of R&D that tends to become a genus](https://tech.jxpress.net/entry/2021/10/27/160154) and [PyTorch Lightning explained by a heavy user](https://tech.jxpress.net/entry/2021/11/17/112214). (Now these blogs are written in Japanese. If you want to see, please translate it into your language. We would like to translate it in English and publish it someday)
