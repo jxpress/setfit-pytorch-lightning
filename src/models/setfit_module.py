@@ -70,7 +70,7 @@ class SetfitPLModule(LightningModule, SetFitTrainer):
         # LightningModule.__init__(self)
         super().__init__()
         self.model = SetFitModel.from_pretrained(model_id, **kwargs)
-        SetFitTrainer.__init__(  # TODO If **kwargs are introduced to SetFitTrainer, omit these inputs
+        SetFitTrainer.__init__(
             self,
             model=self.model,
             model_init=model_init,
@@ -159,6 +159,7 @@ class SetfitPLModule(LightningModule, SetFitTrainer):
         self.train_embeddings = []
         self.train_targets = []
 
+        # train sentence transformers
         if not self.hparams.train_sentence_transformers_once or (
             self.hparams.train_sentence_transformers_once and self.current_epoch == 0
         ):
@@ -272,7 +273,7 @@ class SetfitPLModule(LightningModule, SetFitTrainer):
                 opt.zero_grad()
                 self.manual_backward(loss)
                 opt.step()
-            # log train metrics
+
             return {
                 "loss": loss,
                 "preds": preds,
@@ -284,7 +285,7 @@ class SetfitPLModule(LightningModule, SetFitTrainer):
             features, labels = batch
             embeddings = self.model_body(features)["sentence_embedding"]
             if is_training:
-                # for adding global_step count. If model_head is nn.Module, opt.step increases the number of global_step count
+                # for global_step count. Since model_head is not nn.Module, we cannot run opt.step(), which increases the number of global_step count
                 self.trainer.fit_loop.epoch_loop.batch_loop.manual_loop.optim_step_progress.total.completed += (
                     1
                 )
@@ -393,10 +394,10 @@ class SetfitPLModule(LightningModule, SetFitTrainer):
             prediction = torch.cat([output["preds"] for output in outputs]).numpy()
         else:
             prediction = np.concatenate([output["preds"] for output in outputs])
-        texts = self.trainer.test_dataloaders[0].dataset.x
-        target = self.trainer.test_dataloaders[0].dataset.y
+        texts = self.trainer.test_dataloaders[0].dataset.x[: len(prediction)]
+        target = self.trainer.test_dataloaders[0].dataset.y[: len(prediction)]
 
-        if hasattr(self.logger, "_save_dir"):
+        if hasattr(self.logger, "_save_dir") and not self.trainer.fast_dev_run:
             res_df = pd.DataFrame(
                 {
                     "texts": texts,
@@ -405,7 +406,7 @@ class SetfitPLModule(LightningModule, SetFitTrainer):
                 }
             )
 
-            res_df.to_csv(os.path.join(self.logger._save_dir, "result.csv"), index=False)
+            res_df.to_csv(os.path.join(str(self.logger._save_dir), "result.csv"), index=False)
 
     def predict_step(self, batch: Any, batch_idx: int):
         pass

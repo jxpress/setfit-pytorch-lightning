@@ -29,6 +29,9 @@ test-full: ## Run all tests
 train: ## Train the model
 	python src/train.py
 
+operation-check: ## Train the model
+	python src/train.py ++trainer.fast_dev_run=true
+
 debug: ## Enter debugging mode with pdb
 	#
 	# tips:
