@@ -80,7 +80,7 @@ class DataModule(LightningDataModule):
     def setup(self, stage: Optional[str] = None):
 
         if stage == "fit" or stage is None:
-            self.train_dataset: Dataset = SetFitDataset(
+            self.setfit_train_dataset: Dataset = SetFitDataset(
                 self.train_dataset["text"],
                 self.train_dataset["label"],
                 tokenizer=self.trainer.model.model_body.tokenizer,
@@ -88,7 +88,7 @@ class DataModule(LightningDataModule):
                 if self.hparams.max_input_length
                 else self.trainer.model.model_body.get_max_seq_length(),
             )
-            self.valid_dataset: Dataset = SetFitDataset(
+            self.setfit_valid_dataset: Dataset = SetFitDataset(
                 self.valid_dataset["text"],
                 self.valid_dataset["label"],
                 tokenizer=self.trainer.model.model_body.tokenizer,
@@ -99,7 +99,7 @@ class DataModule(LightningDataModule):
 
         if stage == "test" or stage is None:
             # test_dataset is composed of valid_data since test data of sst2 contains unlabel data
-            self.test_dataset: Dataset = SetFitDataset(
+            self.setfit_test_dataset: Dataset = SetFitDataset(
                 self.test_dataset["text"],
                 self.test_dataset["label"],
                 tokenizer=self.trainer.model.model_body.tokenizer,
@@ -110,7 +110,7 @@ class DataModule(LightningDataModule):
 
     def train_dataloader(self):
         return DataLoader(
-            dataset=self.train_dataset,
+            dataset=self.setfit_train_dataset,
             batch_size=self.hparams.batch_size,
             collate_fn=SetFitDataset.collate_fn,
             num_workers=self.hparams.num_workers,
@@ -120,7 +120,7 @@ class DataModule(LightningDataModule):
 
     def val_dataloader(self):
         return DataLoader(
-            dataset=self.valid_dataset,
+            dataset=self.setfit_valid_dataset,
             batch_size=self.hparams.batch_size,
             collate_fn=SetFitDataset.collate_fn,
             num_workers=self.hparams.num_workers,
@@ -130,7 +130,7 @@ class DataModule(LightningDataModule):
 
     def test_dataloader(self):
         return DataLoader(
-            dataset=self.test_dataset,
+            dataset=self.setfit_test_dataset,
             batch_size=self.hparams.batch_size,
             collate_fn=SetFitDataset.collate_fn,
             num_workers=self.hparams.num_workers,
