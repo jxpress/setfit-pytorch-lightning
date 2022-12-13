@@ -1,4 +1,4 @@
-# Seifit-PyTorch-Lightning
+# Setfit-PyTorch-Lightning
 
 ![main_theme](/documents/main_theme.png)
 
