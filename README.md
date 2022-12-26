@@ -2,6 +2,8 @@
 
 ![main_theme](/documents/main_theme.png)
 
+**🎉 We are happy to be featured in the [official SetFit repository](https://github.com/huggingface/setfit).**
+
 <br>
 
 # 🤗 About SetFit
