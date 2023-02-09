@@ -16,7 +16,7 @@ hydra-optuna-sweeper==1.2.0
 # comet-ml
 
 # --------- pipsetfit --------- #
-setfit==0.4.1
+setfit==0.6.0
 # --------- others --------- #
 pyrootutils     # standardizing the project root setup
 pre-commit      # hooks for applying linters on commit
